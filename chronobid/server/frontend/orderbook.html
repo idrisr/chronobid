@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Order Book</title>
+    <style>
+      body { font-family: sans-serif; padding: 2rem; }
+      h1 { margin-bottom: 1rem; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 2rem; }
+      th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+      th { background: #f2f2f2; }
+      .asks { color: red; }
+      .bids { color: green; }
+    </style>
+  </head>
+  <body>
+    <h1>Order Book</h1>
+    <h2>Bids</h2>
+    <table id="bidsTable">
+      <thead>
+        <tr>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>ID</th>
+          <th>Time</th>
+          <th>Side</th>
+          <th>Type</th>
+          <th>User</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <h2>Asks</h2>
+    <table id="asksTable">
+      <thead>
+        <tr>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>ID</th>
+          <th>Time</th>
+          <th>Side</th>
+          <th>Type</th>
+          <th>User</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      async function loadOrderBook() {
+        const res = await fetch("/orderbook");
+        const { bids, asks } = await res.json();
+
+        bids.sort((a, b) => b.price - a.price);
+        asks.sort((a, b) => a.price - b.price);
+
+        function populateTable(tableId, orders, cssClass) {
+          const table = document.getElementById(tableId).querySelector('tbody');
+          table.innerHTML = '';
+          orders.forEach(order => {
+            const row = document.createElement('tr');
+            row.className = cssClass;
+            row.innerHTML = `
+              <td>${order.price}</td>
+              <td>${order.quantity}</td>
+              <td>${order.orderId}</td>
+              <td>${order.timestamp}</td>
+              <td>${order.side}</td>
+              <td>${order.orderType}</td>
+              <td>${order.userId}</td>
+            `;
+            table.appendChild(row);
+          });
+        }
+
+        populateTable('bidsTable', bids, 'bids');
+        populateTable('asksTable', asks, 'asks');
+      }
+
+      loadOrderBook();
+      setInterval(loadOrderBook, 1000); // auto-refresh every second
+    </script>
+  </body>
+</html>
