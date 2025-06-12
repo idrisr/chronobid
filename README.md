@@ -24,6 +24,7 @@ bash deploy.sh
 
 ## in progress
 * fix market order matching
+* fix ALL matching lol 🤣
 * endpoint for returning completed trades
 
 
